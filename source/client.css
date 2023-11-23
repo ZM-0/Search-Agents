@@ -1,0 +1,26 @@
+body {
+    margin: 0;
+}
+
+
+.container {
+    display: flex;
+    position: relative;
+    height: 95vh;
+    width: 95vw;
+    inset: 2.5vh 2.5vw;
+    justify-content: space-evenly;
+    background-color: #F002;
+}
+
+
+.map-section {
+    width: 60%;
+    background-color: #0F02;
+}
+
+
+.control-section {
+    width: 30%;
+    background-color: #00F2;
+}
