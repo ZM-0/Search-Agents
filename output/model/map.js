@@ -45,7 +45,6 @@ export class Map {
                 if (this.cells[i][j].isExit && this.exit)
                     throw new Error("The map can't have multiple exits");
                 else if (this.cells[i][j].isExit) {
-                    console.log(`Found exit at ${i}, ${j}`);
                     this.exit = this.cells[i][j];
                 }
             }

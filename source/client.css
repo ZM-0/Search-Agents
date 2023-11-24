@@ -9,23 +9,23 @@ body {
 .container {
     display: flex;
     position: relative;
-    height: 95vh;
+    height: 80vh;
     width: 95vw;
-    inset: 2.5vh 2.5vw;
+    inset: 10vh 2.5vw;
     justify-content: space-evenly;
-    background-color: #F002;
+    border: 1px solid #000;
 }
 
 
 .map-section {
     width: 60%;
-    background-color: #0F02;
+    border: 1px solid #000;
 }
 
 
 .control-section {
     width: 30%;
-    background-color: #00F2;
+    border: 1px solid #000;
 }
 
 
@@ -39,4 +39,35 @@ body {
 
 
 .cell {
+
+}
+
+
+/* * * * * * * * * * * CUSTOM DROPDOWN MENU * * * * * * * * * * */
+
+
+.dropdown {
+    display: inline-block;
+    border-radius: 1rem;
+    border: 1px #000 solid;
+    box-shadow: 0 0 2rem #AAF;
+}
+
+
+.dropdown-item {
+    padding: 1rem;
+    border-radius: 1rem;
+    text-align: center;
+}
+
+
+.dropdown-item:hover {
+    background-color: #00F2;
+    /* box-shadow: 0 0 1rem #BBF inset; */
+}
+
+
+.divider {
+    margin: 0;
+    border: 1px #000 solid;
 }
