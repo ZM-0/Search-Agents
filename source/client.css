@@ -26,6 +26,7 @@ body {
 .control-section {
     width: 30%;
     border: 1px solid #000;
+    text-align: center;
 }
 
 
@@ -43,14 +44,46 @@ body {
 }
 
 
+/* * * * * * * * * * * CONTROL PANEL * * * * * * * * * * */
+
+
+.shelf {
+    display: flex;
+    justify-content: space-evenly;
+    /* background-color: #0F02; */
+}
+
+
+button {
+    padding: 1rem;
+    border-radius: 1rem;
+    border: none;
+    background-color: #FFF;
+    box-shadow: 0 0 1rem #00F;
+}
+
+
+button:hover {
+    background-color: #00F2;
+}
+
+
 /* * * * * * * * * * * CUSTOM DROPDOWN MENU * * * * * * * * * * */
+
+
+.dropdown-wrapper {
+    position: relative;
+    height: 3rem;
+    width: 120px;
+}
 
 
 .dropdown {
     display: inline-block;
+    position: absolute;
     border-radius: 1rem;
-    border: 1px #000 solid;
-    box-shadow: 0 0 2rem #AAF;
+    background-color: #FFF;
+    box-shadow: 0 0 1rem #00F;
 }
 
 
@@ -63,7 +96,6 @@ body {
 
 .dropdown-item:hover {
     background-color: #00F2;
-    /* box-shadow: 0 0 1rem #BBF inset; */
 }
 
 
