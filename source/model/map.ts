@@ -1,4 +1,4 @@
-import { Cell, ICell } from "./cell.js";
+import { Cell, CellType, ICell } from "./cell.js";
 import { Player } from "./player.js";
 
 
@@ -98,5 +98,24 @@ export class Map {
      */
     public getCell(row: number, column: number): Cell {
         return this.cells[row][column];
+    }
+
+
+    /**
+     * Converts the map to a string definition of the map layout.
+     * @returns A string representation of the map.
+     */
+    public toString(): string {
+        let mapString: string = "";
+
+        for (let i: number = 0; i < this.getHeight(); i++) {
+            for (let j: number = 0; j < this.getWidth(); j++) {
+                mapString += this.getCell(i, j).toString();
+            }
+
+            if (this.getHeight() - 1 > i) mapString += '\n';
+        }
+
+        return mapString;
     }
 }

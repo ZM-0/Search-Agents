@@ -77,4 +77,19 @@ export class Map {
     getCell(row, column) {
         return this.cells[row][column];
     }
+    /**
+     * Converts the map to a string definition of the map layout.
+     * @returns A string representation of the map.
+     */
+    toString() {
+        let mapString = "";
+        for (let i = 0; i < this.getHeight(); i++) {
+            for (let j = 0; j < this.getWidth(); j++) {
+                mapString += this.getCell(i, j).toString();
+            }
+            if (this.getHeight() - 1 > i)
+                mapString += '\n';
+        }
+        return mapString;
+    }
 }

@@ -120,4 +120,19 @@ export class Cell {
         if (setPlayer && CellType.WALL === this.type) throw new Error("Can't set a player on a wall");
         this._hasPlayer = setPlayer;
     }
+
+
+    /**
+     * Converts the cell to a string descriptor.
+     * @returns A single character cell descriptor.
+     */
+    public toString(): string {
+        if (this.isExit && this.hasPlayer) return 'X';
+        else if (this.hasPlayer) return 'P';
+        else if (this.isExit) return 'E';
+        else switch (this.type) {
+            case CellType.EMPTY: return ' ';
+            case CellType.WALL: return '#';
+        }
+    }
 }

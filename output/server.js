@@ -5,6 +5,9 @@ import url from "node:url";
 const HOST = "localhost";
 const PORT = 8000;
 const application = express();
+// Convert request bodies to text
+application.use(express.text());
+// Log server reqeusts
 application.use((request, response, next) => {
     console.log(`Received ${request.method} request for ${request.path}`);
     if ("PUT" === request.method || "POST" === request.method) {
@@ -21,12 +24,23 @@ application.get("/maps", (request, response) => {
         response.send(maps.map((name) => `Map ${name.slice(3, -4)}`));
     });
 });
-// Handle requests for a map
+// Handle requests to get a map
 application.get("/maps/:mapId", (request, response) => {
     const mapPath = path.join(url.fileURLToPath(import.meta.url), `../../maps/map${request.params["mapId"]}.map`);
     console.log(`Sending map ${request.params["mapId"]}`);
     fileSystem.readFile(mapPath).then((mapFile) => {
         response.send(mapFile.toString());
+    });
+});
+// Handle requests to set a map
+application.put("/maps/:mapId", (request, response) => {
+    const mapPath = path.join(url.fileURLToPath(import.meta.url), `../../maps/map${request.params["mapId"]}.map`);
+    console.log(`Saving map ${request.params["mapId"]}:`);
+    const mapString = request.body;
+    console.log(mapString);
+    fileSystem.writeFile(mapPath, mapString).then(() => {
+        console.log(`Saved map ${request.params["mapId"]}`);
+        response.end();
     });
 });
 // Handle requests for files

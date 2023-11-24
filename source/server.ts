@@ -9,6 +9,11 @@ const PORT: number = 8000;
 const application: express.Application = express();
 
 
+// Convert request bodies to text
+application.use(express.text());
+
+
+// Log server reqeusts
 application.use((request: express.Request, response: express.Response, next: express.NextFunction) => {
     console.log(`Received ${request.method} request for ${request.path}`);
     
@@ -33,7 +38,7 @@ application.get("/maps", (request: express.Request, response: express.Response) 
 });
 
 
-// Handle requests for a map
+// Handle requests to get a map
 application.get("/maps/:mapId", (request: express.Request, response: express.Response) => {
     const mapPath: string = path.join(
         url.fileURLToPath(import.meta.url),
@@ -44,6 +49,24 @@ application.get("/maps/:mapId", (request: express.Request, response: express.Res
 
     fileSystem.readFile(mapPath).then((mapFile: Buffer) => {
         response.send(mapFile.toString());
+    });
+});
+
+
+// Handle requests to set a map
+application.put("/maps/:mapId", (request: express.Request, response: express.Response) => {
+    const mapPath: string = path.join(
+        url.fileURLToPath(import.meta.url),
+        `../../maps/map${request.params["mapId"]}.map`
+    );
+
+    console.log(`Saving map ${request.params["mapId"]}:`);
+    const mapString: string = request.body;
+    console.log(mapString);
+
+    fileSystem.writeFile(mapPath, mapString).then(() => {
+        console.log(`Saved map ${request.params["mapId"]}`);
+        response.end();
     });
 });
 

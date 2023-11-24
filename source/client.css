@@ -49,6 +49,7 @@ body {
 
 .shelf {
     display: flex;
+    margin: 4rem auto;
     justify-content: space-evenly;
     /* background-color: #0F02; */
 }
