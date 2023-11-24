@@ -39,8 +39,9 @@ body {
 }
 
 
-.cell {
-
+.cell:hover {
+    transform: scale(1.2);
+    filter: brightness(1.2);
 }
 
 

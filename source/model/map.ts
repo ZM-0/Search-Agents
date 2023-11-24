@@ -1,13 +1,5 @@
-import { Cell, CellType, ICell } from "./cell.js";
+import { Cell } from "./cell.js";
 import { Player } from "./player.js";
-
-
-/**
- * An interface for map objects.
- */
-interface IMap {
-    cells: ICell[][];
-}
 
 
 /**

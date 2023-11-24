@@ -21,7 +21,7 @@ export class Cell {
     /**
      * The cell type.
      */
-    type;
+    _type;
     /**
      * Indicates whether the cell is an exit.
      */
@@ -51,20 +51,43 @@ export class Cell {
         this.position = position.map((value) => value);
         switch (descriptor) {
             case ' ':
-                this.type = CellType.EMPTY;
+                this._type = CellType.EMPTY;
                 break;
             case '#':
-                this.type = CellType.WALL;
+                this._type = CellType.WALL;
                 break;
             case 'P':
                 this._hasPlayer = true;
-                this.type = CellType.EMPTY;
+                this._type = CellType.EMPTY;
                 break;
             case 'X': this._hasPlayer = true;
             case 'E':
                 this._isExit = true;
-                this.type = CellType.EMPTY;
+                this._type = CellType.EMPTY;
         }
+    }
+    /**
+     * Gets the current cell type.
+     */
+    get type() {
+        return this._type;
+    }
+    /**
+     * Checks if the cell can have the given type.
+     * @param cellType The type to set the cell to.
+     */
+    canHaveType(cellType) {
+        return CellType.EMPTY === cellType || !this.hasPlayer && !this.isExit;
+    }
+    /**
+     * Sets the cell type. If the cell has a player or is an exit, the type cannot be set to a wall.
+     * @param newType The new cell type.
+     * @throws When trying to set a cell to a wall when it is an exit or has a player.
+     */
+    set type(newType) {
+        if (!this.canHaveType(newType))
+            throw new Error("A cell with a player or an exit can't be a wall");
+        this._type = newType;
     }
     /**
      * Checks if the cell is an exit.
@@ -74,6 +97,7 @@ export class Cell {
     }
     /**
      * Sets if the cell is an exit.
+     * @param setExit Indicates whether to set the cell as an exit or not.
      * @throws When trying to set a cell to an exit when it can't be an exit.
      */
     set isExit(setExit) {
@@ -89,6 +113,7 @@ export class Cell {
     }
     /**
      * Sets if the cell has a player on it.
+     * @param setPlayer Indicates whether to set a player on the cell or not.
      * @throws When trying to set a player on a cell that can't have a player.
      */
     set hasPlayer(setPlayer) {

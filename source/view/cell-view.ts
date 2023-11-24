@@ -6,6 +6,12 @@ import { Cell, CellType } from "../model/cell.js";
  */
 export class CellView {
     /**
+     * The type to set cells to with a click and drag.
+     */
+    private static floodType: CellType | null = null;
+
+
+    /**
      * The cell being displayed.
      */
     private readonly cell: Cell;
@@ -24,11 +30,45 @@ export class CellView {
     constructor(cell: Cell) {
         this.cell = cell;
         this.selector = `#cell-${this.cell.position[0]}-${this.cell.position[1]}`;
-
-        // Create the cell element
         $(".map").append(`<div id="${this.selector.slice(1)}" class="cell"></div>`);
+        this.update();  // Draw the initial cell
 
-        // Style the cell
+        // Toggle the cell type when clicked
+        $(this.selector).on("click", () => {
+            if (CellType.EMPTY === this.cell.type && !this.cell.canHaveType(CellType.WALL)) return;
+            if (CellType.EMPTY === this.cell.type) this.cell.type = CellType.WALL;
+            else this.cell.type = CellType.EMPTY;
+            this.update();
+        });
+
+        // Prevent default handling
+        $(this.selector).on("mousedown", event => event.preventDefault());
+
+        // Start a click and drag of cell types
+        $(this.selector).on("mousedown", () => {
+            if (this.cell.isExit || this.cell.hasPlayer) return;
+            CellView.floodType = this.cell.type;
+        });
+
+        // Set the cell type during a click and drag
+        $(this.selector).on("mouseenter", () => {
+            if (null !== CellView.floodType && this.cell.canHaveType(CellView.floodType)) {
+                this.cell.type = CellView.floodType;
+                this.update();
+            }
+        });
+
+        // Stop click and drag
+        $(this.selector).on("mouseup", () => {
+            CellView.floodType = null;
+        });
+    }
+
+
+    /**
+     * Redraws the cell.
+     */
+    private update(): void {
         if (this.cell.isExit) $(this.selector).css("background-color", "#0F0");
         else switch (this.cell.type) {
             case CellType.EMPTY: $(this.selector).css("background-color", "#CCF"); break;
