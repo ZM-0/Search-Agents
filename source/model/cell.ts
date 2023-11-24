@@ -37,7 +37,7 @@ export class Cell {
     /**
      * The cell type.
      */
-    private readonly type!: CellType;
+    public readonly type!: CellType;
 
 
     /**

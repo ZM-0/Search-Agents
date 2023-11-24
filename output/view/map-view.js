@@ -12,6 +12,14 @@ export class MapView {
      */
     map;
     /**
+     * The map display height.
+     */
+    mapDisplayHeight;
+    /**
+     * The map display width.
+     */
+    mapDisplayWidth;
+    /**
      * The edge length of each cell.
      */
     cellSize;
@@ -25,29 +33,49 @@ export class MapView {
      */
     constructor(map) {
         this.map = map;
-        $(".map-section").append(`<div class="map"></div>`);
-        // Create the cell displays
+        $(".map-section").append(`<div class="map"></div>`); // Create the map element
+        this.createCellViews(); // Create the cell displays
+        this.findCellSize(); // Calculate the cell size
+        this.setStyles(); // Create and style the map element
+        // Update the cell and map displays if the window size changes
+        $(window).on("resize", () => {
+            this.findCellSize();
+            this.setStyles();
+        });
+    }
+    /**
+     * Creates displays for all the cells in the map.
+     */
+    createCellViews() {
         for (let i = 0; i < this.map.getHeight(); i++) {
             this.cellViews.push([]);
             for (let j = 0; j < this.map.getWidth(); j++) {
                 this.cellViews[i].push(new CellView(this.map.getCell(i, j)));
             }
         }
-        // Calculate the cell size
+    }
+    /**
+     * Calculates the cell size.
+     */
+    findCellSize() {
         this.cellSize = `min(
             calc(${$(".map-section").height() - MapView.GAP * (this.map.getHeight() - 1)}px / ${this.map.getHeight()}),
             calc(${$(".map-section").width() - MapView.GAP * (this.map.getWidth() - 1)}px / ${this.map.getWidth()})
         )`;
         $(".cell").css({ "height": this.cellSize, "width": this.cellSize });
-        // Create and style the map element
-        const cssHeight = `calc(${this.map.getHeight()} * (${this.cellSize} + ${MapView.GAP}px) - ${MapView.GAP}px)`;
-        const cssWidth = `calc(${this.map.getWidth()} * (${this.cellSize} + ${MapView.GAP}px) - ${MapView.GAP}px)`;
+        this.mapDisplayHeight = `calc(${this.map.getHeight()} * (${this.cellSize} + ${MapView.GAP}px) - ${MapView.GAP}px)`;
+        this.mapDisplayWidth = `calc(${this.map.getWidth()} * (${this.cellSize} + ${MapView.GAP}px) - ${MapView.GAP}px)`;
+    }
+    /**
+     * Sets the CSS styles for the map.
+     */
+    setStyles() {
         $(".map").css({
-            "height": cssHeight,
-            "width": cssWidth,
+            "height": this.mapDisplayHeight,
+            "width": this.mapDisplayWidth,
             "inset": `
-                calc((${$(".map-section").height()}px - ${cssHeight}) / 2)
-                calc((${$(".map-section").width()}px - ${cssWidth}) / 2)`,
+                calc((${$(".map-section").height()}px - ${this.mapDisplayHeight}) / 2)
+                calc((${$(".map-section").width()}px - ${this.mapDisplayWidth}) / 2)`,
             "grid-template-rows": `repeat(${this.map.getHeight()}, 1fr)`,
             "grid-template-columns": `repeat(${this.map.getWidth()}, 1fr)`
         });

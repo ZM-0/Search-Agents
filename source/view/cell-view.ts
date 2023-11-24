@@ -1,4 +1,4 @@
-import { Cell } from "../model/cell.js";
+import { Cell, CellType } from "../model/cell.js";
 
 
 /**
@@ -27,5 +27,12 @@ export class CellView {
 
         // Create the cell element
         $(".map").append(`<div id="${this.selector.slice(1)}" class="cell"></div>`);
+
+        // Style the cell
+        if (this.cell.isExit) $(this.selector).css("background-color", "#0F0");
+        else switch (this.cell.type) {
+            case CellType.EMPTY: $(this.selector).css("background-color", "#CCF"); break;
+            case CellType.WALL: $(this.selector).css("background-color", "#44F");
+        }
     }
 }
