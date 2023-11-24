@@ -1,4 +1,5 @@
 import { Cell, ICell } from "./cell.js";
+import { Player } from "./player.js";
 
 
 /**
@@ -16,7 +17,19 @@ export class Map {
     /**
      * The cells in the map.
      */
-    private cells: Cell[][] = [];
+    private readonly cells: Cell[][] = [];
+
+
+    /**
+     * The player.
+     */
+    private readonly player!: Player;
+
+
+    /**
+     * The map exit.
+     */
+    private readonly exit!: Cell;
 
 
     /**
@@ -25,10 +38,12 @@ export class Map {
      * @throws If the map string is empty.
      * @throws If the map string isn't rectangular.
      * @throws If the map string contains an unidentified character.
+     * @throws If the map doesn't have a player or has multiple players.
+     * @throws If the map doesn't have an exit or has multiple exits.
      */
     constructor(mapString: string) {
         if (0 === mapString.length) throw new Error("The map string cannot be empty");
-        
+
         const rows: string[] = mapString.split(/\r?\n/);
         const width: number = rows[0].length;
 
@@ -38,40 +53,51 @@ export class Map {
             this.cells.push([]);
 
             for (let j: number = 0; j < rows[i].length; j++) {
-                try {
-                    this.cells[i].push(new Cell(rows[i][j]));
-                } catch (error) {
-                    throw error;
+                this.cells[i].push(new Cell(rows[i][j], [i, j]));
+
+                // Check and set the player
+                if (this.cells[i][j].hasPlayer && this.player) throw new Error("The map can't have multiple players");
+                else if (this.cells[i][j].hasPlayer) this.player = new Player(this.cells[i][j]);
+
+                // Check and set the exit
+                if (this.cells[i][j].isExit && this.exit) throw new Error("The map can't have multiple exits");
+                else if (this.cells[i][j].isExit) {
+                    console.log(`Found exit at ${i}, ${j}`);
+                    this.exit = this.cells[i][j];
                 }
             }
         }
+
+        if (!this.player) throw new Error("The map must have one player");
+        if (!this.exit) throw new Error("The map must have one exit");
     }
 
 
     /**
-     * Creates a map from a data object.
-     * @param data A map data object.
-     * @returns A new map instance.
-     * @throws If the map cell data is empty.
-     * @throws If the map cell data isn't rectangular.
+     * Gets the map height in cells.
+     * @returns The map height in cells.
      */
-    public static fromData(data: IMap): Map {
-        if (0 === data.cells.length) throw new Error("The map data cannot have no cells");
+    public getHeight(): number {
+        return this.cells.length;
+    }
 
-        const map: Map = new Map(" ");  // Create dummy map
-        map.cells = [];
-        const width: number = data.cells[0].length;
 
-        for (let i: number = 0; i < data.cells.length; i++) {
-            if (data.cells[i].length !== width) throw new Error("The cell data must be a 2D rectangular array");
+    /**
+     * Gets the map width in cells.
+     * @returns The map width in cells.
+     */
+    public getWidth(): number {
+        return this.cells[0].length;
+    }
 
-            map.cells.push([]);
 
-            for (let j: number = 0; j < data.cells[i].length; j++) {
-                map.cells[i].push(Cell.fromData(data.cells[i][j]));
-            }
-        }
-
-        return map;
+    /**
+     * Gets a cell from the map.
+     * @param row The cell row index.
+     * @param column The cell column index.
+     * @returns The selected cell.
+     */
+    public getCell(row: number, column: number): Cell {
+        return this.cells[row][column];
     }
 }

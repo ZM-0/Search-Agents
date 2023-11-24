@@ -1,3 +1,6 @@
+/* * * * * * * * * * * MAIN LAYOUT * * * * * * * * * * */
+
+
 body {
     margin: 0;
 }
@@ -23,4 +26,19 @@ body {
 .control-section {
     width: 30%;
     background-color: #00F2;
+}
+
+
+/* * * * * * * * * * * MAP DISPLAY * * * * * * * * * * */
+
+
+.map {
+    display: grid;
+    position: relative;
+    background-color: #00F2;
+}
+
+
+.cell {
+    background-color: #F0F2;
 }

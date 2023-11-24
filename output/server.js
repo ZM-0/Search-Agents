@@ -1,4 +1,5 @@
 import express from "express";
+import fileSystem from "node:fs/promises";
 import path from "node:path";
 import url from "node:url";
 const HOST = "localhost";
@@ -12,6 +13,23 @@ application.use((request, response, next) => {
     }
     next();
 });
+// Handle requests for the list of maps
+application.get("/maps", (request, response) => {
+    const directory = path.join(url.fileURLToPath(import.meta.url), "../../maps");
+    console.log(`Sending directory ${directory}`);
+    fileSystem.readdir(directory).then((maps) => {
+        response.send(maps.map((name) => `Map ${name.slice(3, -4)}`));
+    });
+});
+// Handle requests for a map
+application.get("/maps/:mapId", (request, response) => {
+    const mapPath = path.join(url.fileURLToPath(import.meta.url), `../../maps/map${request.params["mapId"]}.map`);
+    console.log(`Sending map ${request.params["mapId"]}`);
+    fileSystem.readFile(mapPath).then((mapFile) => {
+        response.send(mapFile.toString());
+    });
+});
+// Handle requests for files
 application.get(/.+/, (request, response) => {
     const filePath = path.join(url.fileURLToPath(import.meta.url), "..", "/" === request.path ? "../source/client.html" :
         "/client.css" === request.path ? "../source/client.css" :

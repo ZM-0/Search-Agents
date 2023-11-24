@@ -1,5 +1,8 @@
 {
   "name": "search-agents",
   "version": "1.0.0",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@types/jquery": "^3.5.29"
+  }
 }
