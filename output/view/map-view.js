@@ -80,4 +80,10 @@ export class MapView {
             "grid-template-columns": `repeat(${this.map.getWidth()}, 1fr)`
         });
     }
+    /**
+     * Destroys this map view from the browser display.
+     */
+    destroy() {
+        $(".map").remove();
+    }
 }

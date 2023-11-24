@@ -17,7 +17,7 @@ export class Dropdown {
     /**
      * The index of the selected option.
      */
-    private selected: number = 0;
+    private _selection: number = 0;
 
 
     /**
@@ -49,6 +49,15 @@ export class Dropdown {
 
 
     /**
+     * Gets the current selection.
+     * @returns The currently selected index.
+     */
+    get selection(): number {
+        return this._selection;
+    }
+
+
+    /**
      * Adds an option to the dropdown.
      * @param option The dropdown option label to add.
      */
@@ -58,17 +67,17 @@ export class Dropdown {
         this.options.push(option);
 
         $(this.selector).append(`<div class="dropdown-item dropdown-item-${index}">${option}</div>`);
-        $(this.selector + ` > .dropdown-item-${index}`).hide().on("click", () => {
-            this.selected = index;
+        $(this.selector + ` > .dropdown-item-${index}`).on("click", () => {
+            this._selection = index;
             $(this.selector + " > .dropdown-item-default").text(option);
-        });
+        }).hide();
     }
 
 
     /**
      * Opens the dropdown.
      */
-    public show(): void {
+    private show(): void {
         $(this.selector + " > hr").show();
         $(this.selector + " > .dropdown-item").show();
     }
@@ -77,7 +86,7 @@ export class Dropdown {
     /**
      * Hides the dropdown.
      */
-    public hide(): void {
+    private hide(): void {
         $(this.selector + " > hr").hide();
         $(this.selector + " > .dropdown-item").not(".dropdown-item-default").hide();
     }

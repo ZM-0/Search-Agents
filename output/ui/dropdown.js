@@ -13,7 +13,7 @@ export class Dropdown {
     /**
      * The index of the selected option.
      */
-    selected = 0;
+    _selection = 0;
     /**
      * Indicates if the dropdown is open.
      */
@@ -39,6 +39,13 @@ export class Dropdown {
         });
     }
     /**
+     * Gets the current selection.
+     * @returns The currently selected index.
+     */
+    get selection() {
+        return this._selection;
+    }
+    /**
      * Adds an option to the dropdown.
      * @param option The dropdown option label to add.
      */
@@ -48,10 +55,10 @@ export class Dropdown {
             $(this.selector + " > .dropdown-item-default").text(option);
         this.options.push(option);
         $(this.selector).append(`<div class="dropdown-item dropdown-item-${index}">${option}</div>`);
-        $(this.selector + ` > .dropdown-item-${index}`).hide().on("click", () => {
-            this.selected = index;
+        $(this.selector + ` > .dropdown-item-${index}`).on("click", () => {
+            this._selection = index;
             $(this.selector + " > .dropdown-item-default").text(option);
-        });
+        }).hide();
     }
     /**
      * Opens the dropdown.
