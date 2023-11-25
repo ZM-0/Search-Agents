@@ -11,7 +11,7 @@ export class Action {
     /**
      * The (x, y) change in position of the action.
      */
-    private readonly delta: [number, number];
+    public readonly delta: [number, number];
 
 
     /**

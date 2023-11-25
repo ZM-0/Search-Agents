@@ -2,6 +2,17 @@ import { Cell, CellType } from "../model/cell.js";
 
 
 /**
+ * Additional display settings for empty cells.
+ */
+export enum DisplaySetting {
+    DEFAULT,
+    IN_PATH,
+    IN_FRONTIER,
+    IN_REACHED
+}
+
+
+/**
  * Displays a cell in a map.
  */
 export class CellView {
@@ -27,6 +38,12 @@ export class CellView {
      * The CSS selector for the cell.
      */
     public readonly selector: string;
+
+
+    /**
+     * Additional display settings for the cell if its empty.
+     */
+    public displaySetting: DisplaySetting = DisplaySetting.DEFAULT;
 
 
     /**
@@ -98,9 +115,13 @@ export class CellView {
      */
     public update(): void {
         if (this.cell.isExit) $(this.selector).css("background-color", "#0F0");
-        else switch (this.cell.type) {
-            case CellType.EMPTY: $(this.selector).css("background-color", "#CCF"); break;
-            case CellType.WALL: $(this.selector).css("background-color", "#44F");
+        else if (this.cell.hasPlayer) $(this.selector).css("background-color", "#CCF");
+        else if (CellType.WALL === this.cell.type) $(this.selector).css("background-color", "#44F");
+        else switch (this.displaySetting) {
+            case DisplaySetting.IN_PATH: $(this.selector).css("background-color", "#F0F"); break;
+            case DisplaySetting.IN_FRONTIER: $(this.selector).css("background-color", "#0FF"); break;
+            case DisplaySetting.IN_REACHED: $(this.selector).css("background-color", "#0CC"); break;
+            case DisplaySetting.DEFAULT: $(this.selector).css("background-color", "#CCF");
         }
     }
 }

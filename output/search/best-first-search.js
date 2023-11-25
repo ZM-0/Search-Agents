@@ -1,4 +1,5 @@
 import { Action } from "../model/action.js";
+import { DisplaySetting } from "../view/cell-view.js";
 import { Hashtable } from "./hashtable.js";
 import { MinimumHeap } from "./heap.js";
 import { Node, State } from "./utilities.js";
@@ -11,35 +12,63 @@ export class BestFirstSearcher {
      */
     map;
     /**
+     * The display for the map.
+     */
+    mapView;
+    /**
      * Creates a new best-first graph-searcher.
      * @param map The map on which to run searches.
+     * @param mapView The display for the map.
      */
-    constructor(map) {
+    constructor(map, mapView) {
         this.map = map;
+        this.mapView = mapView;
     }
     /**
      * Runs the best-first graph-search algorithm.
      * @param initialState The initial problem state.
      * @returns A list of the actions in the solution path.
      */
-    search(initialState) {
+    async search(initialState) {
         const frontier = new MinimumHeap((node) => node.pathCost);
         const reached = new Hashtable(this.map.getHeight(), this.map.getWidth());
         let node = new Node(initialState);
         frontier.insert(node);
         reached.add(node.state, node);
+        this.stylePosition(node.state.playerPosition, DisplaySetting.IN_FRONTIER);
         while (0 < frontier.size()) {
+            await this.pause(10);
             node = frontier.getMinimum();
+            this.stylePosition(node.state.playerPosition, DisplaySetting.IN_REACHED);
             if (this.isGoal(node.state))
                 return this.buildPath(node);
             this.expand(node).forEach((child) => {
                 if (!reached.has(child.state) || child.pathCost < reached.get(child.state).pathCost) {
                     frontier.insert(child);
                     reached.add(child.state, child);
+                    this.stylePosition(child.state.playerPosition, DisplaySetting.IN_FRONTIER);
                 }
             });
         }
         return [];
+    }
+    /**
+     * Blocks thread execution for some time.
+     * @param time The number of milliseconds to pause for.
+     */
+    pause(time) {
+        return new Promise(resolve => setTimeout(resolve, time));
+    }
+    /**
+     * Sets the display setting for a cell to demonstrate the search process.
+     * @param xyPosition The x-y position of the cell to style.
+     * @param setting The display setting for the cell.
+     */
+    stylePosition(xyPosition, setting) {
+        const rcPosition = this.map.toRowColumn(xyPosition);
+        const cellView = this.mapView.getCellView(rcPosition[0], rcPosition[1]);
+        cellView.displaySetting = setting;
+        cellView.update();
     }
     /**
      * Builds the action sequence from the start state to the state at the given goal node.
@@ -49,6 +78,7 @@ export class BestFirstSearcher {
         const path = [];
         while (null !== node.parent) {
             path.push(node.action);
+            this.stylePosition(node.state.playerPosition, DisplaySetting.IN_PATH);
             node = node.parent;
         }
         return path.reverse();
@@ -73,8 +103,9 @@ export class BestFirstSearcher {
      * @returns True if the state is a goal, false if not.
      */
     isGoal(state) {
-        return state.playerPosition[0] === this.map.getExit().position[0] &&
-            state.playerPosition[1] === this.map.getExit().position[1];
+        const exitRowColumn = this.map.getExit().position;
+        const exitXY = this.map.toXY(exitRowColumn);
+        return state.playerPosition[0] === exitXY[0] && state.playerPosition[1] === exitXY[1];
     }
     /**
      * Gets the valid actions from a state.
@@ -87,7 +118,9 @@ export class BestFirstSearcher {
         allActions.forEach((action) => {
             const nextState = this.transition(state, action);
             // Validate the state
-            if (this.map.getCell(this.map.getHeight() - nextState.playerPosition[1] - 1, nextState.playerPosition[0]).canHavePlayer())
+            const row = this.map.getHeight() - nextState.playerPosition[1] - 1;
+            const column = nextState.playerPosition[0];
+            if (this.map.contains(row, column) && this.map.getCell(row, column).canHavePlayer())
                 validActions.push(action);
         });
         return validActions;

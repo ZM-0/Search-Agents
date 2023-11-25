@@ -50,7 +50,8 @@ export class MinimumHeap {
         let parent = Math.floor((index - 1) / 2);
         while (-1 !== parent) {
             if (this.evaluate(this.values[parent]) <= this.evaluate(this.values[index]))
-                continue;
+                break;
+            ;
             this.swap(parent, index);
             index = parent;
             parent = Math.floor((index - 1) / 2);
@@ -64,7 +65,7 @@ export class MinimumHeap {
         let smallestChild = this.getSmallestChild(index);
         while (null !== smallestChild) {
             if (this.evaluate(this.values[smallestChild]) >= this.evaluate(this.values[index]))
-                continue;
+                break;
             this.swap(smallestChild, index);
             index = smallestChild;
             smallestChild = this.getSmallestChild(index);

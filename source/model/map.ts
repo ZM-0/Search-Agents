@@ -79,6 +79,26 @@ export class Map {
 
 
     /**
+     * Converts a row-column position to an x-y position.
+     * @param rowColumnPosition A row-column position.
+     * @returns The corresponding x-y position.
+     */
+    public toXY(rowColumnPosition: [number, number]): [number, number] {
+        return [rowColumnPosition[1], this.getHeight() - rowColumnPosition[0] - 1];
+    }
+
+
+    /**
+     * Converts an x-y position to a row-column position.
+     * @param xyPosition An x-y position.
+     * @returns The corresponding row-column position.
+     */
+    public toRowColumn(xyPosition: [number, number]): [number, number] {
+        return [this.getHeight() - xyPosition[1] - 1, xyPosition[0]];
+    }
+
+
+    /**
      * Gets a cell from the map.
      * @param row The cell row index.
      * @param column The cell column index.
@@ -86,6 +106,17 @@ export class Map {
      */
     public getCell(row: number, column: number): Cell {
         return this.cells[row][column];
+    }
+
+
+    /**
+     * Checks if a row and column index is within the map.
+     * @param row The row index.
+     * @param column The colum index.
+     * @returns True if the position is within the map, false if not.
+     */
+    public contains(row: number, column: number): boolean {
+        return 0 <= row && this.getHeight() > row && 0 <= column && this.getWidth() > column;
     }
 
 

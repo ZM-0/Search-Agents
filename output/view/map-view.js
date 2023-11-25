@@ -1,4 +1,4 @@
-import { CellView } from "./cell-view.js";
+import { CellView, DisplaySetting } from "./cell-view.js";
 import { PlayerView } from "./player-view.js";
 /**
  * Displays a map in the browser.
@@ -138,9 +138,29 @@ export class MapView {
         });
     }
     /**
+     * Gets the display for a cell.
+     * @param row The row index of the cell.
+     * @param column The column index of the cell.
+     * @returns The selected cell view.
+     */
+    getCellView(row, column) {
+        return this.cellViews[row][column];
+    }
+    /**
      * Destroys this map view from the browser display.
      */
     destroy() {
         $(".map").remove();
+    }
+    /**
+     * Resets the displays of all cells to their default settings.
+     */
+    reset() {
+        this.cellViews.forEach((row) => {
+            row.forEach((cellView) => {
+                cellView.displaySetting = DisplaySetting.DEFAULT;
+                cellView.update();
+            });
+        });
     }
 }

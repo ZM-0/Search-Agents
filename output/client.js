@@ -1,4 +1,6 @@
 import { Map } from "./model/map.js";
+import { BestFirstSearcher } from "./search/best-first-search.js";
+import { State } from "./search/utilities.js";
 import { Dropdown } from "./ui/dropdown.js";
 import { MapView } from "./view/map-view.js";
 let currentMapId;
@@ -26,6 +28,19 @@ function saveMap(mapId) {
     fetch(`/maps/${mapId}`, { method: "PUT", body: mapString })
         .then(() => console.log(`Saved map ${mapId}`));
 }
+function search() {
+    const playerRowColumn = map.player.cell.position;
+    const initialState = new State(map.toXY(playerRowColumn));
+    console.log("Searching...");
+    (new BestFirstSearcher(map, mapView)).search(initialState).then((path) => {
+        if (0 === path.length)
+            console.log("Failed to find solution path");
+        else {
+            console.log("Found solution path");
+            console.log(path);
+        }
+    });
+}
 fetch("/maps")
     .then((response) => response.json())
     .then((maps) => {
@@ -45,5 +60,13 @@ fetch("/maps")
     //     const width: number = $("#width-input").val() as number;
     //     if (1 > height || 1 > width) throw new Error("Map dimensions must be positive");
     // });
+    // Set up the searching
+    $("#search-button").on("click", () => {
+        search();
+    });
+    // Set up display resetting
+    $("#reset-button").on("click", () => {
+        mapView.reset();
+    });
 });
 loadMap(1);

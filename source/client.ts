@@ -1,4 +1,7 @@
+import { Action } from "./model/action.js";
 import { Map } from "./model/map.js";
+import { BestFirstSearcher } from "./search/best-first-search.js";
+import { State } from "./search/utilities.js";
 import { Dropdown } from "./ui/dropdown.js";
 import { MapView } from "./view/map-view.js";
 
@@ -33,6 +36,20 @@ function saveMap(mapId: number | string): void {
 }
 
 
+function search(): void {
+    const playerRowColumn: [number, number] = map.player.cell.position;
+    const initialState: State = new State(map.toXY(playerRowColumn));
+    console.log("Searching...");
+    (new BestFirstSearcher(map, mapView)).search(initialState).then((path: Action[]) => {
+        if (0 === path.length) console.log("Failed to find solution path");
+        else {
+            console.log("Found solution path");
+            console.log(path);
+        }
+    });
+}
+
+
 fetch("/maps")
     .then((response: Response) => response.json())
     .then((maps: string[]) => {
@@ -57,6 +74,16 @@ fetch("/maps")
 
 
         // });
+
+        // Set up the searching
+        $("#search-button").on("click", () => {
+            search();
+        });
+
+        // Set up display resetting
+        $("#reset-button").on("click", () => {
+            mapView.reset();
+        });
     });
 
 loadMap(1);

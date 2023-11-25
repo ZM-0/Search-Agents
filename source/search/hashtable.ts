@@ -30,18 +30,19 @@ export class Hashtable {
      */
     constructor(mapHeight: number, mapWidth: number) {
         this.maximumValue = Math.max(mapHeight, mapWidth);
-        const size: number = mapHeight * mapWidth;
-        this.prime = this.getPrime();
+        const size: number = (mapWidth - 1) * this.maximumValue + (mapHeight - 1) + 1;
+        this.prime = this.getPrime(size);
         this.table = new Array(size);
     }
 
 
     /**
      * Generates the next prime number larger than the hashtable size.
+     * @param size The hashtable size.
      * @returns The next prime number larger than the hashtable size.
      */
-    private getPrime(): number {
-        let candidate: number = this.table.length + 1;
+    private getPrime(size: number): number {
+        let candidate: number = size + 1;
         let prime: number | null = null;
 
         while (null === prime) {
@@ -67,7 +68,7 @@ export class Hashtable {
      * @param state The state to hash.
      */
     private hash(state: State): number {
-        return ((state.playerPosition[0] * this.maximumValue + state.playerPosition[1]) % this.prime) % this.table.length;
+        return state.playerPosition[0] * this.maximumValue + state.playerPosition[1];//) % this.prime) % this.table.length;
     }
 
 
@@ -77,7 +78,15 @@ export class Hashtable {
      * @param value The node to be stored as the value.
      */
     public add(key: State, value: Node): void {
-        this.table[this.hash(key)] = value;
+        let hashValue: number = this.hash(key);
+        // let probeCount: number = 0;
+
+        // while (!this.table[hashValue] && this.table.length > probeCount) {
+        //     hashValue = (hashValue++) % this.table.length;
+        //     probeCount++;
+        // }
+
+        this.table[hashValue] = value;
     }
 
 

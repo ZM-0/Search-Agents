@@ -1,6 +1,6 @@
 import { Cell } from "../model/cell.js";
 import { Map } from "../model/map.js";
-import { CellView } from "./cell-view.js";
+import { CellView, DisplaySetting } from "./cell-view.js";
 import { PlayerView } from "./player-view.js";
 
 
@@ -178,9 +178,33 @@ export class MapView {
 
 
     /**
+     * Gets the display for a cell.
+     * @param row The row index of the cell.
+     * @param column The column index of the cell.
+     * @returns The selected cell view.
+     */
+    public getCellView(row: number, column: number): CellView {
+        return this.cellViews[row][column];
+    }
+
+
+    /**
      * Destroys this map view from the browser display.
      */
     public destroy(): void {
         $(".map").remove();
+    }
+
+
+    /**
+     * Resets the displays of all cells to their default settings.
+     */
+    public reset(): void {
+        this.cellViews.forEach((row: CellView[]) => {
+            row.forEach((cellView: CellView) => {
+                cellView.displaySetting = DisplaySetting.DEFAULT;
+                cellView.update();
+            });
+        });
     }
 }
