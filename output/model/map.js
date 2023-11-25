@@ -78,6 +78,26 @@ export class Map {
         return this.cells[row][column];
     }
     /**
+     * Moves the player onto a cell.
+     * @param cell The cell to move the player onto.
+     * @throws When trying to set the player on a cell that can't have a player.
+     */
+    movePlayer(cell) {
+        this.player.cell.hasPlayer = false;
+        this.player.cell = cell;
+        this.player.cell.hasPlayer = true;
+    }
+    /**
+     * Moves the map exit.
+     * @param cell The cell to move the exit to.
+     * @throws When trying to set a cell which can't be an exit to an exit.
+     */
+    moveExit(cell) {
+        this.exit.isExit = false;
+        this.exit = cell;
+        this.exit.isExit = true;
+    }
+    /**
      * Converts the map to a string definition of the map layout.
      * @returns A string representation of the map.
      */

@@ -29,7 +29,7 @@ export class CellView {
      */
     constructor(cell: Cell) {
         this.cell = cell;
-        this.selector = `#cell-${this.cell.position[0]}-${this.cell.position[1]}`;
+        this.selector = CellView.getSelector(cell);
         $(".map").append(`<div id="${this.selector.slice(1)}" class="cell"></div>`);
         this.update();  // Draw the initial cell
 
@@ -62,6 +62,15 @@ export class CellView {
         $(this.selector).on("mouseup", () => {
             CellView.floodType = null;
         });
+    }
+
+
+    /**
+     * Finds the CSS selector of the display of a cell.
+     * @param cell The cell to find the selector of.
+     */
+    public static getSelector(cell: Cell): string {
+        return `#cell-${cell.position[0]}-${cell.position[1]}`;
     }
 
 

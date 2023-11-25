@@ -15,13 +15,13 @@ export class Map {
     /**
      * The player.
      */
-    private readonly player!: Player;
+    public readonly player!: Player;
 
 
     /**
      * The map exit.
      */
-    private readonly exit!: Cell;
+    private exit!: Cell;
 
 
     /**
@@ -90,6 +90,30 @@ export class Map {
      */
     public getCell(row: number, column: number): Cell {
         return this.cells[row][column];
+    }
+
+
+    /**
+     * Moves the player onto a cell.
+     * @param cell The cell to move the player onto.
+     * @throws When trying to set the player on a cell that can't have a player.
+     */
+    public movePlayer(cell: Cell): void {
+        this.player.cell.hasPlayer = false;
+        this.player.cell = cell;
+        this.player.cell.hasPlayer = true;
+    }
+
+
+    /**
+     * Moves the map exit.
+     * @param cell The cell to move the exit to.
+     * @throws When trying to set a cell which can't be an exit to an exit.
+     */
+    public moveExit(cell: Cell): void {
+        this.exit.isExit = false;
+        this.exit = cell;
+        this.exit.isExit = true;
     }
 
 

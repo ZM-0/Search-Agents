@@ -1,5 +1,6 @@
 import { Map } from "../model/map.js";
 import { CellView } from "./cell-view.js";
+import { PlayerView } from "./player-view.js";
 
 
 /**
@@ -43,15 +44,22 @@ export class MapView {
 
 
     /**
+     * The display for the player.
+     */
+    private readonly playerView: PlayerView;
+
+
+    /**
      * Creates a new map display.
      * @param map The map to be displayed.
      */
     constructor(map: Map) {
         this.map = map;
         $(".map-section").append(`<div class="map"></div>`);    // Create the map element
-        this.createCellViews();     // Create the cell displays
-        this.findCellSize();        // Calculate the cell size
-        this.setStyles();           // Create and style the map element
+        this.createCellViews();                                 // Create the cell displays
+        this.findCellSize();                                    // Calculate the cell size
+        this.setStyles();                                       // Create and style the map element
+        this.playerView = new PlayerView(this.map.player);      // Create the player display
 
         // Update the cell and map displays if the window size changes
         $(window).on("resize", () => {

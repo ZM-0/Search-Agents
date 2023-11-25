@@ -8,7 +8,7 @@ export class Player {
     /**
      * The cell the player is on.
      */
-    private readonly cell: Cell;
+    public cell: Cell;
 
 
     /**

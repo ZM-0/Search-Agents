@@ -112,12 +112,19 @@ export class Cell {
         return this._hasPlayer;
     }
     /**
+     * Checks if the cell can have a player.
+     * @returns True if the cell can have a player, false if not.
+     */
+    canHavePlayer() {
+        return CellType.EMPTY === this.type;
+    }
+    /**
      * Sets if the cell has a player on it.
      * @param setPlayer Indicates whether to set a player on the cell or not.
      * @throws When trying to set a player on a cell that can't have a player.
      */
     set hasPlayer(setPlayer) {
-        if (setPlayer && CellType.WALL === this.type)
+        if (setPlayer && !this.canHavePlayer())
             throw new Error("Can't set a player on a wall");
         this._hasPlayer = setPlayer;
     }

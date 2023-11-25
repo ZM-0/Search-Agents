@@ -39,5 +39,11 @@ fetch("/maps")
     $("#save-button").on("click", () => {
         saveMap(currentMapId);
     });
+    // // Set up the map creation
+    // $("#create-button").on("click", () => {
+    //     const height: number = $("#height-input").val() as number;
+    //     const width: number = $("#width-input").val() as number;
+    //     if (1 > height || 1 > width) throw new Error("Map dimensions must be positive");
+    // });
 });
 loadMap(1);

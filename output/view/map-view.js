@@ -1,4 +1,5 @@
 import { CellView } from "./cell-view.js";
+import { PlayerView } from "./player-view.js";
 /**
  * Displays a map in the browser.
  */
@@ -28,6 +29,10 @@ export class MapView {
      */
     cellViews = [];
     /**
+     * The display for the player.
+     */
+    playerView;
+    /**
      * Creates a new map display.
      * @param map The map to be displayed.
      */
@@ -37,6 +42,7 @@ export class MapView {
         this.createCellViews(); // Create the cell displays
         this.findCellSize(); // Calculate the cell size
         this.setStyles(); // Create and style the map element
+        this.playerView = new PlayerView(this.map.player); // Create the player display
         // Update the cell and map displays if the window size changes
         $(window).on("resize", () => {
             this.findCellSize();
