@@ -112,12 +112,21 @@ export class Cell {
 
 
     /**
+     * Checks if the cell can be an exit.
+     * @returns True if the cell can be an exit, else false.
+     */
+    public canBeExit(): boolean {
+        return CellType.EMPTY === this.type;
+    }
+
+
+    /**
      * Sets if the cell is an exit.
      * @param setExit Indicates whether to set the cell as an exit or not.
      * @throws When trying to set a cell to an exit when it can't be an exit.
      */
     set isExit(setExit: boolean) {
-        if (setExit && CellType.WALL === this.type) throw new Error("Can't set a wall to an exit");
+        if (setExit && !this.canBeExit()) throw new Error("Can't set a wall to an exit");
         this._isExit = setExit;
     }
 

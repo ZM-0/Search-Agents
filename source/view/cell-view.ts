@@ -12,6 +12,12 @@ export class CellView {
 
 
     /**
+     * The exit cell view before dragging the exit.
+     */
+    private static exitView: CellView | null = null;
+
+
+    /**
      * The cell being displayed.
      */
     private readonly cell: Cell;
@@ -58,9 +64,25 @@ export class CellView {
             }
         });
 
-        // Stop click and drag
+        // Stop type click and drag
         $(this.selector).on("mouseup", () => {
             CellView.floodType = null;
+        });
+
+        // Start dragging the exit
+        $(this.selector).on("mousedown", () => {
+            if (this.cell.isExit) CellView.exitView = this;
+        });
+
+        // Stop dragging the exit
+        $(this.selector).on("mouseup", () => {
+            if (null !== CellView.exitView && this.cell.canBeExit()) {
+                CellView.exitView.cell.isExit = false;
+                CellView.exitView.update();
+                this.cell.isExit = true;
+                this.update();
+                CellView.exitView = null;
+            }
         });
     }
 
