@@ -19,7 +19,22 @@ export class PlayerView {
         this.player = player;
         this.cellSelector = CellView.getSelector(player.cell);
         $(this.cellSelector).append(`<div class="player"></div>`);
-        // Style the player
+        this.update();
+    }
+    /**
+     * Moves the player view on to a different cell.
+     * @param cell The cell to move the player view on to.
+     */
+    move(cell) {
+        $(this.cellSelector + " > .player").remove();
+        this.cellSelector = CellView.getSelector(cell);
+        $(this.cellSelector).append(`<div class="player"></div>`);
+        this.update();
+    }
+    /**
+     * Redraws the player.
+     */
+    update() {
         const cellSize = $(".cell").height();
         const scale = 0.8;
         $(this.cellSelector + " > .player").css({

@@ -28,7 +28,15 @@ export class CellView {
         this.selector = CellView.getSelector(cell);
         $(".map").append(`<div id="${this.selector.slice(1)}" class="cell"></div>`);
         this.update(); // Draw the initial cell
-        // Toggle the cell type when clicked
+        // Add event handlers
+        $(this.selector).on("mousedown", event => event.preventDefault());
+        this.addTypeToggleHandler();
+        this.addTypeDragHandlers();
+    }
+    /**
+     * Adds an event handler for toggling the cell type.
+     */
+    addTypeToggleHandler() {
         $(this.selector).on("click", () => {
             if (CellType.EMPTY === this.cell.type && !this.cell.canHaveType(CellType.WALL))
                 return;
@@ -38,9 +46,12 @@ export class CellView {
                 this.cell.type = CellType.EMPTY;
             this.update();
         });
-        // Prevent default handling
-        $(this.selector).on("mousedown", event => event.preventDefault());
-        // Start a click and drag of cell types
+    }
+    /**
+     * Adds event handlers changing and dragging the cell type.
+     */
+    addTypeDragHandlers() {
+        // Start dragging the cell type
         $(this.selector).on("mousedown", () => {
             if (this.cell.isExit || this.cell.hasPlayer)
                 return;
@@ -53,24 +64,9 @@ export class CellView {
                 this.update();
             }
         });
-        // Stop type click and drag
+        // Stop type dragging the cell type
         $(this.selector).on("mouseup", () => {
             CellView.floodType = null;
-        });
-        // Start dragging the exit
-        $(this.selector).on("mousedown", () => {
-            if (this.cell.isExit)
-                CellView.exitView = this;
-        });
-        // Stop dragging the exit
-        $(this.selector).on("mouseup", () => {
-            if (null !== CellView.exitView && this.cell.canBeExit()) {
-                CellView.exitView.cell.isExit = false;
-                CellView.exitView.update();
-                this.cell.isExit = true;
-                this.update();
-                CellView.exitView = null;
-            }
         });
     }
     /**

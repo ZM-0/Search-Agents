@@ -35,13 +35,11 @@ export class Map {
      */
     constructor(mapString: string) {
         if (0 === mapString.length) throw new Error("The map string cannot be empty");
-
         const rows: string[] = mapString.split(/\r?\n/);
         const width: number = rows[0].length;
 
         for (let i: number = 0; i < rows.length; i++) {
             if (rows[i].length !== width) throw new Error("The map must be rectangular");
-
             this.cells.push([]);
 
             for (let j: number = 0; j < rows[i].length; j++) {
@@ -53,9 +51,7 @@ export class Map {
 
                 // Check and set the exit
                 if (this.cells[i][j].isExit && this.exit) throw new Error("The map can't have multiple exits");
-                else if (this.cells[i][j].isExit) {
-                    this.exit = this.cells[i][j];
-                }
+                else if (this.cells[i][j].isExit) this.exit = this.cells[i][j];
             }
         }
 

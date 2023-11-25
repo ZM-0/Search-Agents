@@ -20,13 +20,13 @@ export class CellView {
     /**
      * The cell being displayed.
      */
-    private readonly cell: Cell;
+    public readonly cell: Cell;
 
 
     /**
      * The CSS selector for the cell.
      */
-    private readonly selector: string;
+    public readonly selector: string;
 
 
     /**
@@ -39,18 +39,31 @@ export class CellView {
         $(".map").append(`<div id="${this.selector.slice(1)}" class="cell"></div>`);
         this.update();  // Draw the initial cell
 
-        // Toggle the cell type when clicked
+        // Add event handlers
+        $(this.selector).on("mousedown", event => event.preventDefault());
+        this.addTypeToggleHandler();
+        this.addTypeDragHandlers();
+    }
+
+
+    /**
+     * Adds an event handler for toggling the cell type.
+     */
+    private addTypeToggleHandler(): void {
         $(this.selector).on("click", () => {
             if (CellType.EMPTY === this.cell.type && !this.cell.canHaveType(CellType.WALL)) return;
             if (CellType.EMPTY === this.cell.type) this.cell.type = CellType.WALL;
             else this.cell.type = CellType.EMPTY;
             this.update();
         });
+    }
 
-        // Prevent default handling
-        $(this.selector).on("mousedown", event => event.preventDefault());
 
-        // Start a click and drag of cell types
+    /**
+     * Adds event handlers changing and dragging the cell type.
+     */
+    private addTypeDragHandlers(): void {
+        // Start dragging the cell type
         $(this.selector).on("mousedown", () => {
             if (this.cell.isExit || this.cell.hasPlayer) return;
             CellView.floodType = this.cell.type;
@@ -64,25 +77,9 @@ export class CellView {
             }
         });
 
-        // Stop type click and drag
+        // Stop type dragging the cell type
         $(this.selector).on("mouseup", () => {
             CellView.floodType = null;
-        });
-
-        // Start dragging the exit
-        $(this.selector).on("mousedown", () => {
-            if (this.cell.isExit) CellView.exitView = this;
-        });
-
-        // Stop dragging the exit
-        $(this.selector).on("mouseup", () => {
-            if (null !== CellView.exitView && this.cell.canBeExit()) {
-                CellView.exitView.cell.isExit = false;
-                CellView.exitView.update();
-                this.cell.isExit = true;
-                this.update();
-                CellView.exitView = null;
-            }
         });
     }
 
@@ -99,7 +96,7 @@ export class CellView {
     /**
      * Redraws the cell.
      */
-    private update(): void {
+    public update(): void {
         if (this.cell.isExit) $(this.selector).css("background-color", "#0F0");
         else switch (this.cell.type) {
             case CellType.EMPTY: $(this.selector).css("background-color", "#CCF"); break;
