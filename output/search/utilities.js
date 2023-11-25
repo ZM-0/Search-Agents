@@ -8,7 +8,7 @@ export class State {
     playerPosition;
     /**
      * Creates a new state.
-     * @param playerPosition The player's (x, y) position.
+     * @param playerPosition The player's (x, y) position where (0, 0) is the bottom-left cell.
      */
     constructor(playerPosition) {
         this.playerPosition = playerPosition;

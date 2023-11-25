@@ -1,3 +1,6 @@
+import { Action } from "../model/action.js";
+
+
 /**
  * A state in the state space.
  */
@@ -5,12 +8,12 @@ export class State {
     /**
      * The player's (x, y) position.
      */
-    private readonly playerPosition: [number, number];
+    public readonly playerPosition: [number, number];
 
 
     /**
      * Creates a new state.
-     * @param playerPosition The player's (x, y) position.
+     * @param playerPosition The player's (x, y) position where (0, 0) is the bottom-left cell.
      */
     constructor(playerPosition: [number, number]) {
         this.playerPosition = playerPosition;
@@ -37,7 +40,7 @@ export class Node {
     /**
      * The action taken from the parent to this state.
      */
-    private readonly action;
+    private readonly action: Action;
 
 
     /**
@@ -53,7 +56,7 @@ export class Node {
      * @param action The action to get to this node.
      * @param pathCost The total path cost from the start state to this state.
      */
-    constructor(state: State, parent: Node, action, pathCost: number) {
+    constructor(state: State, parent: Node, action: Action, pathCost: number) {
         this.state = state;
         this.parent = parent;
         this.action = action;
