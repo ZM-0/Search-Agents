@@ -77,6 +77,13 @@ export class Map {
         return this.cells[row][column];
     }
     /**
+     * Gets the exit cell.
+     * @returns The exit cell.
+     */
+    getExit() {
+        return this.exit;
+    }
+    /**
      * Moves the player onto a cell.
      * @param cell The cell to move the player onto.
      * @throws When trying to set the player on a cell that can't have a player.

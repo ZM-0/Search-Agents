@@ -41,7 +41,7 @@ export class Node {
      * @param action The action to get to this node.
      * @param pathCost The total path cost from the start state to this state.
      */
-    constructor(state, parent, action, pathCost) {
+    constructor(state, parent = null, action = null, pathCost = 0) {
         this.state = state;
         this.parent = parent;
         this.action = action;

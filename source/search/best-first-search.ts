@@ -1,4 +1,7 @@
 import { Action } from "../model/action.js";
+import { Map } from "../model/map.js";
+import { Hashtable } from "./hashtable.js";
+import { MinimumHeap } from "./heap.js";
 import { Node, State } from "./utilities.js";
 
 
@@ -7,17 +10,44 @@ import { Node, State } from "./utilities.js";
  */
 export class BestFirstSearcher {
     /**
-     * The initial state in the problem formulation.
+     * The map on which the search is conducted.
      */
-    private readonly initialState: State;
+    private readonly map: Map;
+
+
+    /**
+     * Creates a new best-first graph-searcher.
+     * @param map The map on which to run searches.
+     */
+    constructor(map: Map) {
+        this.map = map;
+    }
 
 
     /**
      * Runs the best-first graph-search algorithm.
+     * @param initialState The initial problem state.
      * @returns A list of the actions in the solution path.
      */
-    public search(): Action[] {
+    public search(initialState: State): Action[] {
+        const frontier: MinimumHeap = new MinimumHeap((node: Node) => node.pathCost);
+        const reached: Hashtable = new Hashtable(this.map.getHeight(), this.map.getWidth());
+        let node: Node = new Node(initialState);
+        frontier.insert(node);
+        reached.add(node.state, node);
 
+        while (0 < frontier.size()) {
+            node = frontier.getMinimum()!;
+            if (this.isGoal(node.state)) return this.buildPath(node);
+            this.expand(node).forEach((child: Node) => {
+                if (!reached.has(child.state) || child.pathCost < reached.get(child.state)!.pathCost) {
+                    frontier.insert(child);
+                    reached.add(child.state, child);
+                }
+            });
+        }
+
+        return [];
     }
 
 
@@ -26,7 +56,14 @@ export class BestFirstSearcher {
      * @param node The goal node at the end of the solution path.
      */
     private buildPath(node: Node): Action[] {
+        const path: Action[] = [];
+        
+        while (null !== node.parent) {
+            path.push(node.action!);
+            node = node.parent;
+        }
 
+        return path.reverse();
     }
 
 
@@ -36,7 +73,14 @@ export class BestFirstSearcher {
      * @param A list of the successor nodes.
      */
     private expand(node: Node): Node[] {
+        const children: Node[] = [];
+        this.getActions(node.state).forEach((action: Action) => {
+            const state: State = this.transition(node.state, action);
+            const pathCost: number = node.pathCost + this.getActionCost(node.state, action, state);
+            children.push(new Node(state, node, action, pathCost));
+        });
 
+        return children;
     }
 
 
@@ -46,7 +90,8 @@ export class BestFirstSearcher {
      * @returns True if the state is a goal, false if not.
      */
     private isGoal(state: State): boolean {
-
+        return state.playerPosition[0] === this.map.getExit().position[0] &&
+               state.playerPosition[1] === this.map.getExit().position[1];
     }
 
 
@@ -56,7 +101,19 @@ export class BestFirstSearcher {
      * @returns A list of the valid actions out of the given state.
      */
     private getActions(state: State): Action[] {
+        const allActions: Action[] = [Action.up(), Action.down(), Action.left(), Action.right()];
+        const validActions: Action[] = [];
+        allActions.forEach((action: Action) => {
+            const nextState: State = this.transition(state, action);
 
+            // Validate the state
+            if (this.map.getCell(
+                    this.map.getHeight() - nextState.playerPosition[1] - 1,
+                    nextState.playerPosition[0]
+                ).canHavePlayer()) validActions.push(action);
+        });
+
+        return validActions;
     }
 
 
@@ -67,7 +124,7 @@ export class BestFirstSearcher {
      * @returns The state resulting from the transition.
      */
     private transition(state: State, action: Action): State {
-
+        return new State(action.applyTo(state.playerPosition));
     }
 
 
@@ -79,6 +136,6 @@ export class BestFirstSearcher {
      * @returns The action cost of the transition.
      */
     private getActionCost(startState: State, action: Action, nextState: State): number {
-
+        return 1;
     }
 }

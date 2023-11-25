@@ -28,25 +28,25 @@ export class Node {
     /**
      * The state at the node.
      */
-    private readonly state: State;
+    public readonly state: State;
 
 
     /**
      * The parent node.
      */
-    private readonly parent: Node;
+    public readonly parent: Node | null;
 
 
     /**
      * The action taken from the parent to this state.
      */
-    private readonly action: Action;
+    public readonly action: Action | null;
 
 
     /**
      * The total path cost from the start state to this state.
      */
-    private readonly pathCost: number;
+    public readonly pathCost: number;
 
 
     /**
@@ -56,7 +56,7 @@ export class Node {
      * @param action The action to get to this node.
      * @param pathCost The total path cost from the start state to this state.
      */
-    constructor(state: State, parent: Node, action: Action, pathCost: number) {
+    constructor(state: State, parent: Node | null = null, action: Action | null = null, pathCost: number = 0) {
         this.state = state;
         this.parent = parent;
         this.action = action;
