@@ -73,6 +73,14 @@ function createMap(height: number, width: number): void {
 }
 
 
+function deleteMap(mapId: number | string): void {
+    console.log(`Deleting map ${mapId}...`);
+    fetch(`/maps/${mapId}`, {method: "DELETE"}).then(
+        () => console.log(`Deleted map ${mapId}`)
+    );
+}
+
+
 function search(): void {
     const playerRowColumn: [number, number] = map.player.cell.position;
     const initialState: State = new State(map.toXY(playerRowColumn));
@@ -115,6 +123,12 @@ $("#create-button").on("click", () => {
     const height: number = $("#height-input").val() as number;
     const width: number = $("#width-input").val() as number;
     createMap(height, width);
+});
+
+
+// Set up map deleting
+$("#delete-button").on("click", () => {
+    deleteMap(currentMapId);
 });
 
 

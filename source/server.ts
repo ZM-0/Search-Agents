@@ -9,6 +9,12 @@ const PORT: number = 8000;
 const application: express.Application = express();
 
 
+// Get the file path for a map
+function getMapPath(mapId: number | string): string {
+    return path.join(url.fileURLToPath(import.meta.url), `../../maps/map${mapId}.map`);
+}
+
+
 // Convert request bodies to text
 application.use(express.text());
 
@@ -30,42 +36,45 @@ application.use((request: express.Request, response: express.Response, next: exp
 application.get("/maps", (request: express.Request, response: express.Response) => {
     const directory: string = path.join(url.fileURLToPath(import.meta.url), "../../maps");
 
-    console.log(`Sending directory ${directory}`);
+    console.log(`Sending maps directory ${directory}...`);
 
     fileSystem.readdir(directory).then((maps: string[]) => {
         response.send(maps.map((name: string) => `Map ${name.slice(3, -4)}`));
+        console.log("Sent maps directory");
     });
 });
 
 
 // Handle requests to get a map
 application.get("/maps/:mapId", (request: express.Request, response: express.Response) => {
-    const mapPath: string = path.join(
-        url.fileURLToPath(import.meta.url),
-        `../../maps/map${request.params["mapId"]}.map`
-    );
+    console.log(`Sending map ${request.params["mapId"]}...`);
 
-    console.log(`Sending map ${request.params["mapId"]}`);
-
-    fileSystem.readFile(mapPath).then((mapFile: Buffer) => {
+    fileSystem.readFile(getMapPath(request.params["mapId"])).then((mapFile: Buffer) => {
         response.send(mapFile.toString());
+        console.log(`Sent map ${request.params["mapId"]}`);
     });
 });
 
 
 // Handle requests to set a map
 application.put("/maps/:mapId", (request: express.Request, response: express.Response) => {
-    const mapPath: string = path.join(
-        url.fileURLToPath(import.meta.url),
-        `../../maps/map${request.params["mapId"]}.map`
-    );
-
-    console.log(`Saving map ${request.params["mapId"]}:`);
+    console.log(`Saving map ${request.params["mapId"]}...`);
     const mapString: string = request.body;
     console.log(mapString);
 
-    fileSystem.writeFile(mapPath, mapString).then(() => {
+    fileSystem.writeFile(getMapPath(request.params["mapId"]), mapString).then(() => {
         console.log(`Saved map ${request.params["mapId"]}`);
+        response.end();
+    });
+});
+
+
+// Handle requests to delete a map
+application.delete("/maps/:mapId", (request: express.Request, response: express.Response) => {
+    console.log(`Deleting map ${request.params["mapId"]}...`);
+
+    fileSystem.rm(getMapPath(request.params["mapId"])).then(() => {
+        console.log(`Deleted map ${request.params["mapId"]}`);
         response.end();
     });
 });
@@ -81,7 +90,7 @@ application.get(/.+/, (request: express.Request, response: express.Response) => 
         request.path
     );
 
-    console.log(`Sending file ${filePath}`);
+    console.log(`Sending file ${filePath}...`);
 
     response.sendFile(filePath, (error: Error) => {
         if (error) console.log(error);
