@@ -7,9 +7,9 @@ export class Dropdown {
      */
     selector;
     /**
-     * The dropdown options.
+     * A live array of the dropdown options.
      */
-    options = [];
+    options;
     /**
      * The index of the selected option.
      */
@@ -21,9 +21,11 @@ export class Dropdown {
     /**
      * Creates a new dropdown menu.
      * @param selector The dropdown selector.
+     * @param options A live array of the dropdown options.
      */
-    constructor(selector) {
+    constructor(selector, options) {
         this.selector = selector;
+        this.options = options;
         $(this.selector)
             .append(`<div class="dropdown-item dropdown-item-default">Select an option</div>`)
             .append(`<hr class="divider">`)
@@ -31,10 +33,7 @@ export class Dropdown {
         $(this.selector + " > hr").hide();
         // Toggle the dropdown menu on click
         $(this.selector).on("click", () => {
-            if (this.isOpen)
-                this.hide();
-            else
-                this.show();
+            this.isOpen ? this.hide() : this.show();
             this.isOpen = !this.isOpen;
         });
     }
@@ -46,42 +45,36 @@ export class Dropdown {
         return this._selection;
     }
     /**
-     * Adds an option to the dropdown.
-     * @param option The dropdown option label to add.
+     * Sets the current selection.
+     * @param index The index of the option to select.
+     * @throws If the index is out of range.
      */
-    addOption(option) {
-        const index = this.options.length;
-        if (0 === index)
-            $(this.selector + " > .dropdown-item-default").text(option);
-        this.options.push(option);
-        $(this.selector).append(`<div class="dropdown-item dropdown-item-${index}">${option}</div>`);
-        $(this.selector + ` > .dropdown-item-${index}`).on("click", () => {
-            this._selection = index;
-            $(this.selector + " > .dropdown-item-default").text(option);
-        }).hide();
-    }
-    /**
-     * Sets an option as selected.
-     * @param index The index of the option to set as selected.
-     */
-    setSelection(index) {
+    set selection(index) {
         if (0 > index || this.options.length <= index)
             throw new RangeError("Selection index out of range");
         this._selection = index;
-        $(this.selector + " > .dropdown-item-default").text(this.options[index]);
+        $(`${this.selector} > .dropdown-item-default`).text(this.options[index]);
     }
     /**
      * Opens the dropdown.
      */
     show() {
-        $(this.selector + " > hr").show();
-        $(this.selector + " > .dropdown-item").show();
+        $(`${this.selector} > hr.divider`).show();
+        console.log("options", this.options);
+        // Create dropdown items for each option
+        $(this.selector).append(...this.options.map((option, index) => `<div class="dropdown-item dropdown-item-${index}">${option}</div>`));
+        // Make an item the selection when it is clicked
+        this.options.forEach((option, index) => {
+            $(`${this.selector} > .dropdown-item-${index}`).on("click", () => {
+                this.selection = index;
+            });
+        });
     }
     /**
      * Hides the dropdown.
      */
     hide() {
-        $(this.selector + " > hr").hide();
-        $(this.selector + " > .dropdown-item").not(".dropdown-item-default").hide();
+        $(`${this.selector} > hr.divider`).hide();
+        $(`${this.selector} > .dropdown-item`).not(".dropdown-item-default").remove();
     }
 }

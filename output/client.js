@@ -3,56 +3,174 @@ import { BestFirstSearcher } from "./search/best-first-search.js";
 import { State } from "./search/utilities.js";
 import { Dropdown } from "./ui/dropdown.js";
 import { MapView } from "./view/map-view.js";
-let mapCount;
-let currentMapId;
-let map;
-let mapView;
-const mapDropdown = new Dropdown("#map-dropdown");
-function loadMap(mapId) {
-    console.log(`Loading map ${mapId}...`);
-    fetch(`/maps/${mapId}`).then((response) => response.text()).then((mapString) => {
-        console.log(mapString);
-        if (mapView)
-            mapView.destroy();
-        currentMapId = mapId;
-        map = new Map(mapString);
-        mapView = new MapView(map);
-        console.log(`Loaded map ${mapId}`);
-    });
+/**
+ * Manages all the maps.
+ */
+class MapManager {
+    /**
+     * The names of all the maps in the form "Map <ID>".
+     */
+    mapNames;
+    /**
+     * The IDs of all the maps.
+     */
+    mapIDs;
+    /**
+     * The index of all the maps that is currently loaded.
+     */
+    currentIndex;
+    /**
+     * The currently loaded map.
+     */
+    map;
+    /**
+     * The display for the currently loaded map.
+     */
+    mapView;
+    /**
+     * Creates a new manager for some maps and loads the first map.
+     * @param names A list of the map names in the form "Map <ID>".
+     */
+    constructor(names) {
+        this.mapNames = names;
+        this.mapIDs = names.map((name) => parseInt(name.slice(4)));
+        this.currentIndex = 0;
+        this.loadMap(this.mapIDs[this.currentIndex]);
+    }
+    /**
+     * Gets the index of the map with the given ID.
+     * @param mapID The map ID.
+     * @returns The map index.
+     */
+    getIndex(mapID) {
+        return this.mapIDs.findIndex((currentID) => currentID === mapID);
+    }
+    /**
+     * Gets the ID of the map with the given index.
+     * @param mapIndex The map index.
+     * @returns The map ID.
+     */
+    getID(mapIndex) {
+        return this.mapIDs[mapIndex];
+    }
+    /**
+     * Gets the current map.
+     * @returns The current map.
+     */
+    getMap() {
+        return this.map;
+    }
+    /**
+     * Gets the map view.
+     * @returns The map view.
+     */
+    getMapView() {
+        return this.mapView;
+    }
+    /**
+     * Fetches, loads, and displays a map.
+     * @param mapID The ID of the map to load.
+     */
+    loadMap(mapID) {
+        console.log(`Loading map ${mapID}...`);
+        fetch(`/maps/${mapID}`).then((response) => response.text()).then((mapString) => {
+            if (this.mapView)
+                this.mapView.destroy(); // Destroy any existing map view
+            this.currentIndex = this.getIndex(mapID);
+            this.map = new Map(mapString);
+            this.mapView = new MapView(this.map);
+            mapDropdown.selection = this.currentIndex;
+            console.log(`Loaded map ${mapID}`);
+        }).catch(() => console.log(`Failed to find map ${mapID}`));
+    }
+    /**
+     * Saves the current map.
+     */
+    saveMap() {
+        console.log(`Saving map ${this.mapIDs[this.currentIndex]}...`);
+        fetch(`/maps/${this.mapIDs[this.currentIndex]}`, { method: "PUT", body: this.map.toString() }).then(() => console.log(`Saved map ${this.mapIDs[this.currentIndex]}`)).catch(() => console.log(`Failed to save map ${this.mapIDs[this.currentIndex]}`));
+    }
+    /**
+     * Creates a new default map with the exit in the top-right and the player in the bototm-left.
+     * @param height The map height in cells.
+     * @param width The map width in cells.
+     */
+    createMap(height, width) {
+        if (!height || !width || 1 > height || 1 > width)
+            throw new Error("Map dimensions must be provided and positive");
+        // Create a new default map string
+        const mapString = ((' '.repeat(width - 1) + "E\n") +
+            (' '.repeat(width) + '\n').repeat(height - 2) +
+            'P' + ' '.repeat(width - 1));
+        // Register the new map with the manager
+        const mapID = this.mapIDs.at(-1) + 1;
+        const mapName = `Map ${mapID}`;
+        this.mapIDs.push(mapID);
+        this.mapNames.push(mapName);
+        console.log(`Creating new map ${mapID}...`);
+        // Create the new map
+        this.map = new Map(mapString);
+        this.mapView = new MapView(this.map);
+        this.currentIndex = this.mapIDs.length - 1;
+        // Register the new map with the dropdown
+        mapDropdown.selection = this.currentIndex;
+        // Save and load the map
+        this.saveMap();
+        this.loadMap(this.getID(this.currentIndex));
+        console.log(`Created new map ${mapID}`);
+    }
+    /**
+     * Deletes a map.
+     * @param mapID The ID of the map to delete.
+     */
+    deleteMap(mapID) {
+        console.log(`Deleting map ${mapID}...`);
+        // Remove the map from the server
+        fetch(`/maps/${mapID}`, { method: "DELETE" }).then(() => {
+            // Remove the map from the map manager
+            const mapIndex = this.getIndex(mapID);
+            this.mapNames.splice(mapIndex, 1);
+            this.mapIDs.splice(mapIndex, 1);
+            if (mapIndex === this.currentIndex) {
+                this.currentIndex %= this.mapIDs.length;
+                this.loadMap(this.getID(this.currentIndex));
+            }
+            else if (mapIndex < this.currentIndex) {
+                this.currentIndex--;
+            }
+            mapDropdown.selection = this.currentIndex;
+            console.log(`Deleted map ${mapID}`);
+        }).catch(() => console.log(`Failed to delete map ${mapID}`));
+    }
 }
-function saveMap(mapId) {
-    console.log(`Saving map ${mapId}...`);
-    const mapString = map.toString();
-    console.log(mapString);
-    fetch(`/maps/${mapId}`, { method: "PUT", body: mapString }).then(() => console.log(`Saved map ${mapId}`));
-}
-function createMap(height, width) {
-    if (!height || !width || 1 > height || 1 > width)
-        console.log("Map dimensions must be positive");
-    // Create a new blank map string
-    let mapString = (' '.repeat(width - 1) + "E\n"); // Exit in top-right corner
-    mapString += (' '.repeat(width) + '\n').repeat(height - 2);
-    mapString += 'P' + ' '.repeat(width - 1);
-    mapCount++;
-    currentMapId = mapCount;
-    console.log(`Creating new map ${currentMapId}...`);
-    console.log(mapString);
-    // Create the new map
-    map = new Map(mapString);
-    mapView = new MapView(map);
-    mapDropdown.addOption(`Map ${currentMapId}`);
-    console.log(`Map count: ${mapCount}`);
-    mapDropdown.setSelection(mapCount - 1);
-    // Save and load the map
-    saveMap(currentMapId);
-    loadMap(currentMapId);
-    console.log(`Created new map ${currentMapId}`);
-}
-function deleteMap(mapId) {
-    console.log(`Deleting map ${mapId}...`);
-    fetch(`/maps/${mapId}`, { method: "DELETE" }).then(() => console.log(`Deleted map ${mapId}`));
-}
-function search() {
+let mapManager;
+let mapDropdown;
+fetch("/maps").then((response) => response.json()).then((maps) => {
+    mapManager = new MapManager(maps);
+    mapDropdown = new Dropdown("#map-dropdown", maps);
+});
+// Set up the map loading
+$("#load-button").on("click", () => {
+    mapManager.loadMap(mapManager.getID(mapDropdown.selection));
+});
+// Set up the map saving
+$("#save-button").on("click", () => {
+    mapManager.saveMap();
+});
+// Set up the map creation
+$("#create-button").on("click", () => {
+    const height = $("#height-input").val();
+    const width = $("#width-input").val();
+    mapManager.createMap(height, width);
+});
+// Set up map deleting
+$("#delete-button").on("click", () => {
+    mapManager.deleteMap(mapManager.getID(mapDropdown.selection));
+});
+// Set up the searching
+$("#search-button").on("click", () => {
+    const map = mapManager.getMap();
+    const mapView = mapManager.getMapView();
     const playerRowColumn = map.player.cell.position;
     const initialState = new State(map.toXY(playerRowColumn));
     console.log("Searching...");
@@ -65,35 +183,8 @@ function search() {
             console.log(path);
         }
     });
-}
-fetch("/maps").then((response) => response.json()).then((maps) => {
-    maps.forEach((map) => mapDropdown.addOption(map));
-    mapCount = maps.length;
-});
-// Set up the map loading
-$("#load-button").on("click", () => {
-    loadMap(mapDropdown.selection + 1);
-});
-// Set up the map saving
-$("#save-button").on("click", () => {
-    saveMap(currentMapId);
-});
-// Set up the map creation
-$("#create-button").on("click", () => {
-    const height = $("#height-input").val();
-    const width = $("#width-input").val();
-    createMap(height, width);
-});
-// Set up map deleting
-$("#delete-button").on("click", () => {
-    deleteMap(currentMapId);
-});
-// Set up the searching
-$("#search-button").on("click", () => {
-    search();
 });
 // Set up display resetting
 $("#reset-button").on("click", () => {
-    mapView.reset();
+    mapManager.getMapView().reset();
 });
-loadMap(1);
