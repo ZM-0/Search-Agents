@@ -32,7 +32,7 @@ export class Map {
         const width = rows[0].length;
         for (let i = 0; i < rows.length; i++) {
             if (rows[i].length !== width)
-                throw new Error("The map must be rectangular");
+                throw new Error(`The map must be rectangular. Expected width ${width} but found width ${rows[i].length}.`);
             this.cells.push([]);
             for (let j = 0; j < rows[i].length; j++) {
                 this.cells[i].push(new Cell(rows[i][j], [i, j]));

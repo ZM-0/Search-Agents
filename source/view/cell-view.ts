@@ -115,13 +115,13 @@ export class CellView {
      */
     public update(): void {
         if (this.cell.isExit) $(this.selector).css("background-color", "#0F0");
-        else if (this.cell.hasPlayer) $(this.selector).css("background-color", "#CCF");
-        else if (CellType.WALL === this.cell.type) $(this.selector).css("background-color", "#44F");
         else switch (this.displaySetting) {
-            case DisplaySetting.IN_PATH: $(this.selector).css("background-color", "#F0F"); break;
+            case DisplaySetting.IN_PATH: $(this.selector).css("background-color", "#F0FA"); break;
             case DisplaySetting.IN_FRONTIER: $(this.selector).css("background-color", "#0FF"); break;
             case DisplaySetting.IN_REACHED: $(this.selector).css("background-color", "#0CC"); break;
-            case DisplaySetting.DEFAULT: $(this.selector).css("background-color", "#CCF");
+            case DisplaySetting.DEFAULT: $(this.selector).css(
+                "background-color", CellType.EMPTY === this.cell.type ? "#CCF" : "#44F"
+            );
         }
     }
 }

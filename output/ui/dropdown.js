@@ -61,6 +61,16 @@ export class Dropdown {
         }).hide();
     }
     /**
+     * Sets an option as selected.
+     * @param index The index of the option to set as selected.
+     */
+    setSelection(index) {
+        if (0 > index || this.options.length <= index)
+            throw new RangeError("Selection index out of range");
+        this._selection = index;
+        $(this.selector + " > .dropdown-item-default").text(this.options[index]);
+    }
+    /**
      * Opens the dropdown.
      */
     show() {
