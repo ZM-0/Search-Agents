@@ -28,7 +28,7 @@ export class Dropdown {
         this.options = options;
         $(this.selector)
             .append(`<div class="dropdown-item dropdown-item-default">Select an option</div>`)
-            .append(`<hr class="divider">`)
+            .append(`<hr class="divider"/>`)
             .css("inset", `auto calc((100px - ${$(this.selector).width()}px) / 2)`);
         $(this.selector + " > hr").hide();
         // Toggle the dropdown menu on click

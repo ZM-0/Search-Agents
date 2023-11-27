@@ -1,15 +1,17 @@
 import { Action } from "./model/action.js";
 import { Map } from "./model/map.js";
+import { Subscriber } from "./observer/subscriber.js";
 import { BestFirstSearcher } from "./search/best-first-search.js";
 import { State } from "./search/utilities.js";
 import { Dropdown } from "./ui/dropdown.js";
+import { CellView } from "./view/cell-view.js";
 import { MapView } from "./view/map-view.js";
 
 
 /**
  * Manages all the maps.
  */
-class MapManager {
+class MapManager implements Subscriber {
     /**
      * The names of all the maps in the form "Map <ID>".
      */
@@ -41,6 +43,12 @@ class MapManager {
 
 
     /**
+     * Indicates if the current map is shown as having unsaved changes.
+     */
+    private changeFlag: boolean = false;
+
+
+    /**
      * Creates a new manager for some maps and loads the first map.
      * @param names A list of the map names in the form "Map <ID>".
      */
@@ -48,10 +56,22 @@ class MapManager {
         this.mapNames = names;
         this.mapIDs = names.map((name: string) => parseInt(name.slice(4)));
         this.currentIndex = 0;
-        this.loadMap(this.mapIDs[this.currentIndex]);
+        this.loadMap(this.mapIDs[this.currentIndex]).then(() => {
+            for (let i: number = 0; i < this.map.getHeight(); i++) {
+                for (let j: number = 0; j < this.map.getWidth(); j++) {
+                    this.mapView.getCellView(i, j).subscribe(this);
+                }
+            }
+        });
     }
-
-
+    
+    public update(): void {
+        if (CellView.unsavedChanges && !this.changeFlag) {
+            $("#current-map").text(`${$("#current-map").text()} *`);
+            this.changeFlag = true;
+        }
+    }
+    
     /**
      * Gets the index of the map with the given ID.
      * @param mapID The map ID.
@@ -94,10 +114,10 @@ class MapManager {
      * Fetches, loads, and displays a map.
      * @param mapID The ID of the map to load.
      */
-    public loadMap(mapID: number): void {
+    public async loadMap(mapID: number): Promise<void> {
         console.log(`Loading map ${mapID}...`);
 
-        fetch(`/maps/${mapID}`).then(
+        return fetch(`/maps/${mapID}`).then(
             (response: Response) => response.text()
         ).then((mapString: string) => {        
             if (this.mapView) this.mapView.destroy();   // Destroy any existing map view
@@ -106,6 +126,8 @@ class MapManager {
             this.map = new Map(mapString);
             this.mapView = new MapView(this.map);
             mapDropdown.selection = this.currentIndex;
+            this.changeFlag = false;
+            $("#current-map").text(`Current: ${this.mapNames[this.currentIndex]}`);
 
             console.log(`Loaded map ${mapID}`);
         }).catch(
@@ -123,9 +145,12 @@ class MapManager {
         fetch(
             `/maps/${this.mapIDs[this.currentIndex]}`,
             {method: "PUT", body: this.map.toString()}
-        ).then(
-            () => console.log(`Saved map ${this.mapIDs[this.currentIndex]}`)
-        ).catch(
+        ).then(() => {
+            CellView.unsavedChanges = false;
+            this.changeFlag = false;
+            $("#current-map").text(`Current: ${this.mapNames[this.currentIndex]}`);
+            console.log(`Saved map ${this.mapIDs[this.currentIndex]}`);
+        }).catch(
             () => console.log(`Failed to save map ${this.mapIDs[this.currentIndex]}`)
         );
     }

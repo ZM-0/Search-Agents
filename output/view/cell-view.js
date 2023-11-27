@@ -1,4 +1,5 @@
 import { CellType } from "../model/cell.js";
+import { Publisher } from "../observer/publisher.js";
 /**
  * Additional display settings for empty cells.
  */
@@ -12,7 +13,11 @@ export var DisplaySetting;
 /**
  * Displays a cell in a map.
  */
-export class CellView {
+export class CellView extends Publisher {
+    /**
+     * Indicates whether any cell has unsaved changed.
+     */
+    static unsavedChanges = false;
     /**
      * The type to set cells to with a click and drag.
      */
@@ -38,6 +43,7 @@ export class CellView {
      * @param cell The cell to be displayed.
      */
     constructor(cell) {
+        super();
         this.cell = cell;
         this.selector = CellView.getSelector(cell);
         $(".map").append(`<div id="${this.selector.slice(1)}" class="cell"></div>`);
@@ -59,10 +65,12 @@ export class CellView {
             else
                 this.cell.type = CellType.EMPTY;
             this.update();
+            CellView.unsavedChanges = true;
+            this.notify();
         });
     }
     /**
-     * Adds event handlers changing and dragging the cell type.
+     * Adds event handlers for changing and dragging the cell type.
      */
     addTypeDragHandlers() {
         // Start dragging the cell type
@@ -76,6 +84,8 @@ export class CellView {
             if (null !== CellView.floodType && this.cell.canHaveType(CellView.floodType)) {
                 this.cell.type = CellView.floodType;
                 this.update();
+                CellView.unsavedChanges = true;
+                this.notify();
             }
         });
         // Stop type dragging the cell type

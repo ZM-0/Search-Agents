@@ -3,6 +3,9 @@
 
 body {
     margin: 0;
+    background-color: #EEE5;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
 }
 
 
@@ -69,6 +72,9 @@ button {
     border: none;
     background-color: #FFF;
     box-shadow: 0 0 1rem #00F;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    font-weight: bold;
 }
 
 
@@ -99,6 +105,11 @@ input {
     border-radius: 1rem;
     background-color: #FFF;
     box-shadow: 0 0 1rem #00F;
+}
+
+
+.dropdown:hover {
+    cursor: default;
 }
 
 
