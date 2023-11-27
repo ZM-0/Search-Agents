@@ -1,8 +1,9 @@
+import { CellController } from "./controller/cell-controller.js";
+import { MapController } from "./controller/map-controller.js";
 import { Map } from "./model/map.js";
 import { BestFirstSearcher } from "./search/best-first-search.js";
 import { State } from "./search/utilities.js";
 import { Dropdown } from "./ui/dropdown.js";
-import { CellView } from "./view/cell-view.js";
 import { MapView } from "./view/map-view.js";
 /**
  * Manages all the maps.
@@ -29,6 +30,10 @@ class MapManager {
      */
     mapView;
     /**
+     * The map controller.
+     */
+    mapController;
+    /**
      * Indicates if the current map is shown as having unsaved changes.
      */
     changeFlag = false;
@@ -43,13 +48,13 @@ class MapManager {
         this.loadMap(this.mapIDs[this.currentIndex]).then(() => {
             for (let i = 0; i < this.map.getHeight(); i++) {
                 for (let j = 0; j < this.map.getWidth(); j++) {
-                    this.mapView.getCellView(i, j).subscribe(this);
+                    this.mapController.getCellController(i, j).subscribe(this);
                 }
             }
         });
     }
     update() {
-        if (CellView.unsavedChanges && !this.changeFlag) {
+        if (CellController.unsavedChanges && !this.changeFlag) {
             $("#current-map").text(`${$("#current-map").text()} *`);
             this.changeFlag = true;
         }
@@ -96,6 +101,7 @@ class MapManager {
             this.currentIndex = this.getIndex(mapID);
             this.map = new Map(mapString);
             this.mapView = new MapView(this.map);
+            this.mapController = new MapController(this.map, this.mapView);
             mapDropdown.selection = this.currentIndex;
             this.changeFlag = false;
             $("#current-map").text(`Current: ${this.mapNames[this.currentIndex]}`);
@@ -108,7 +114,7 @@ class MapManager {
     saveMap() {
         console.log(`Saving map ${this.mapIDs[this.currentIndex]}...`);
         fetch(`/maps/${this.mapIDs[this.currentIndex]}`, { method: "PUT", body: this.map.toString() }).then(() => {
-            CellView.unsavedChanges = false;
+            CellController.unsavedChanges = false;
             this.changeFlag = false;
             $("#current-map").text(`Current: ${this.mapNames[this.currentIndex]}`);
             console.log(`Saved map ${this.mapIDs[this.currentIndex]}`);
@@ -135,6 +141,7 @@ class MapManager {
         // Create the new map
         this.map = new Map(mapString);
         this.mapView = new MapView(this.map);
+        this.mapController = new MapController(this.map, this.mapView);
         this.currentIndex = this.mapIDs.length - 1;
         // Register the new map with the dropdown
         mapDropdown.selection = this.currentIndex;

@@ -33,14 +33,6 @@ export class MapView {
      */
     playerView;
     /**
-     * Indicates if the player is being dragged.
-     */
-    draggingPlayer = false;
-    /**
-     * The cell view of the exit cell before dragging the exit.
-     */
-    exitView = null;
-    /**
      * Creates a new map display.
      * @param map The map to be displayed.
      */
@@ -59,45 +51,6 @@ export class MapView {
         });
     }
     /**
-     * Adds event handlers to a cell view for player dragging.
-     * @param cellView The cell view to add the handlers to.
-     */
-    addPlayerDragHandlers(cellView) {
-        // Start dragging the player
-        $(cellView.selector).on("mousedown", () => {
-            if (cellView.cell.hasPlayer)
-                this.draggingPlayer = true;
-        });
-        // Stop dragging the player
-        $(cellView.selector).on("mouseup", () => {
-            if (this.draggingPlayer && cellView.cell.canHavePlayer()) {
-                this.map.movePlayer(cellView.cell);
-                this.playerView.move(cellView.cell);
-            }
-            this.draggingPlayer = false;
-        });
-    }
-    /**
-     * Adds event handlers to a cell view for exit dragging.
-     * @param cellView The cell view to add the handlers to.
-     */
-    addExitDragHandlers(cellView) {
-        // Start dragging the exit
-        $(cellView.selector).on("mousedown", () => {
-            if (cellView.cell.isExit && !cellView.cell.hasPlayer)
-                this.exitView = cellView;
-        });
-        // Stop dragging the exit
-        $(cellView.selector).on("mouseup", () => {
-            if (null !== this.exitView && cellView.cell.canBeExit()) {
-                this.map.moveExit(cellView.cell);
-                this.exitView.update();
-                cellView.update();
-            }
-            this.exitView = null;
-        });
-    }
-    /**
      * Creates displays for all the cells in the map.
      */
     createCellViews() {
@@ -106,8 +59,6 @@ export class MapView {
             for (let j = 0; j < this.map.getWidth(); j++) {
                 const cellView = new CellView(this.map.getCell(i, j));
                 this.cellViews[i].push(cellView);
-                this.addPlayerDragHandlers(cellView);
-                this.addExitDragHandlers(cellView);
             }
         }
     }

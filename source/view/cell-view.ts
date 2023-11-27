@@ -1,5 +1,4 @@
 import { Cell, CellType } from "../model/cell.js";
-import { Publisher } from "../observer/publisher.js";
 
 
 /**

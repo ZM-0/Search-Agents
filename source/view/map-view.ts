@@ -1,4 +1,3 @@
-import { Cell } from "../model/cell.js";
 import { Map } from "../model/map.js";
 import { CellView, DisplaySetting } from "./cell-view.js";
 import { PlayerView } from "./player-view.js";
@@ -47,19 +46,7 @@ export class MapView {
     /**
      * The display for the player.
      */
-    private readonly playerView: PlayerView;
-
-
-    /**
-     * Indicates if the player is being dragged.
-     */
-    private draggingPlayer: boolean = false;
-
-
-    /**
-     * The cell view of the exit cell before dragging the exit.
-     */
-    private exitView: CellView | null = null;
+    public readonly playerView: PlayerView;
 
 
     /**
@@ -84,51 +71,6 @@ export class MapView {
 
 
     /**
-     * Adds event handlers to a cell view for player dragging.
-     * @param cellView The cell view to add the handlers to.
-     */
-    private addPlayerDragHandlers(cellView: CellView): void {
-        // Start dragging the player
-        $(cellView.selector).on("mousedown", () => {
-            if (cellView.cell.hasPlayer) this.draggingPlayer = true;
-        });
-
-        // Stop dragging the player
-        $(cellView.selector).on("mouseup", () => {
-            if (this.draggingPlayer && cellView.cell.canHavePlayer()) {
-                this.map.movePlayer(cellView.cell);
-                this.playerView.move(cellView.cell);
-            }
-
-            this.draggingPlayer = false;
-        });
-    }
-
-
-    /**
-     * Adds event handlers to a cell view for exit dragging.
-     * @param cellView The cell view to add the handlers to.
-     */
-    private addExitDragHandlers(cellView: CellView): void {
-        // Start dragging the exit
-        $(cellView.selector).on("mousedown", () => {
-            if (cellView.cell.isExit && !cellView.cell.hasPlayer) this.exitView = cellView;
-        });
-
-        // Stop dragging the exit
-        $(cellView.selector).on("mouseup", () => {
-            if (null !== this.exitView && cellView.cell.canBeExit()) {
-                this.map.moveExit(cellView.cell);
-                this.exitView.update();
-                cellView.update();
-            }
-
-            this.exitView = null;
-        });
-    }
-
-
-    /**
      * Creates displays for all the cells in the map.
      */
     private createCellViews(): void {
@@ -138,8 +80,6 @@ export class MapView {
             for (let j: number = 0; j < this.map.getWidth(); j++) {
                 const cellView: CellView = new CellView(this.map.getCell(i, j));
                 this.cellViews[i].push(cellView);
-                this.addPlayerDragHandlers(cellView);
-                this.addExitDragHandlers(cellView);
             }
         }
     }

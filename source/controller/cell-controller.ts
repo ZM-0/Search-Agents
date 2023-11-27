@@ -12,7 +12,7 @@ export class CellController extends Publisher {
      */
     public static unsavedChanges: boolean = false;
 
-    
+
     /**
      * The type to set cells to with a click and drag.
      */
@@ -22,17 +22,17 @@ export class CellController extends Publisher {
     /**
      * The cell being managed.
      */
-    private readonly cell: Cell;
+    public readonly cell: Cell;
 
 
     /**
      * The display for the cell.
      */
-    private readonly view: CellView;
+    public readonly view: CellView;
 
 
     /**
-     * 
+     * Creates a new cell controller.
      * @param cell The cell to be managed.
      * @param view The display for the cell.
      */

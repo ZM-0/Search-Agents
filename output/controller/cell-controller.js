@@ -21,7 +21,7 @@ export class CellController extends Publisher {
      */
     view;
     /**
-     *
+     * Creates a new cell controller.
      * @param cell The cell to be managed.
      * @param view The display for the cell.
      */
