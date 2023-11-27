@@ -18,7 +18,7 @@ export class Cell {
 
 
     /**
-     * The cells row and column index in the map.
+     * The row and column index in the map.
      */
     public readonly position: [number, number];
 

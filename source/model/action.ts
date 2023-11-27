@@ -9,14 +9,14 @@ export class Action {
 
 
     /**
-     * The (x, y) change in position of the action.
+     * The (dx, dy) change in position of the action.
      */
     public readonly delta: [number, number];
 
 
     /**
      * Creates a new action.
-     * @param delta The (x, y) change in position of the action.
+     * @param delta The (dx, dy) change in position of the action.
      */
     constructor(delta: [number, number]) {
         this.delta = delta.map((value: number) => value) as [number, number];

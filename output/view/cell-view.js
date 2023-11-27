@@ -1,5 +1,4 @@
 import { CellType } from "../model/cell.js";
-import { Publisher } from "../observer/publisher.js";
 /**
  * Additional display settings for empty cells.
  */
@@ -13,19 +12,7 @@ export var DisplaySetting;
 /**
  * Displays a cell in a map.
  */
-export class CellView extends Publisher {
-    /**
-     * Indicates whether any cell has unsaved changed.
-     */
-    static unsavedChanges = false;
-    /**
-     * The type to set cells to with a click and drag.
-     */
-    static floodType = null;
-    /**
-     * The exit cell view before dragging the exit.
-     */
-    static exitView = null;
+export class CellView {
     /**
      * The cell being displayed.
      */
@@ -43,55 +30,10 @@ export class CellView extends Publisher {
      * @param cell The cell to be displayed.
      */
     constructor(cell) {
-        super();
         this.cell = cell;
         this.selector = CellView.getSelector(cell);
         $(".map").append(`<div id="${this.selector.slice(1)}" class="cell"></div>`);
         this.update(); // Draw the initial cell
-        // Add event handlers
-        $(this.selector).on("mousedown", event => event.preventDefault());
-        this.addTypeToggleHandler();
-        this.addTypeDragHandlers();
-    }
-    /**
-     * Adds an event handler for toggling the cell type.
-     */
-    addTypeToggleHandler() {
-        $(this.selector).on("click", () => {
-            if (CellType.EMPTY === this.cell.type && !this.cell.canHaveType(CellType.WALL))
-                return;
-            if (CellType.EMPTY === this.cell.type)
-                this.cell.type = CellType.WALL;
-            else
-                this.cell.type = CellType.EMPTY;
-            this.update();
-            CellView.unsavedChanges = true;
-            this.notify();
-        });
-    }
-    /**
-     * Adds event handlers for changing and dragging the cell type.
-     */
-    addTypeDragHandlers() {
-        // Start dragging the cell type
-        $(this.selector).on("mousedown", () => {
-            if (this.cell.isExit || this.cell.hasPlayer)
-                return;
-            CellView.floodType = this.cell.type;
-        });
-        // Set the cell type during a click and drag
-        $(this.selector).on("mouseenter", () => {
-            if (null !== CellView.floodType && this.cell.canHaveType(CellView.floodType)) {
-                this.cell.type = CellView.floodType;
-                this.update();
-                CellView.unsavedChanges = true;
-                this.notify();
-            }
-        });
-        // Stop type dragging the cell type
-        $(this.selector).on("mouseup", () => {
-            CellView.floodType = null;
-        });
     }
     /**
      * Finds the CSS selector of the display of a cell.

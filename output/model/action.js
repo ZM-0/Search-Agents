@@ -7,12 +7,12 @@ export class Action {
      */
     static actions = [];
     /**
-     * The (x, y) change in position of the action.
+     * The (dx, dy) change in position of the action.
      */
     delta;
     /**
      * Creates a new action.
-     * @param delta The (x, y) change in position of the action.
+     * @param delta The (dx, dy) change in position of the action.
      */
     constructor(delta) {
         this.delta = delta.map((value) => value);

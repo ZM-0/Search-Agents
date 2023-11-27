@@ -15,7 +15,7 @@ export class Cell {
      */
     static VALID_DESCRIPTORS = [' ', '#', 'P', 'E', 'X'];
     /**
-     * The cells row and column index in the map.
+     * The row and column index in the map.
      */
     position;
     /**
